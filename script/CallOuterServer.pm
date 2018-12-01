@@ -5,11 +5,27 @@ use strict;
 use JSON;
 use LWP::UserAgent;
 
+
 sub callNuanceEnglishAsrEngine
 {
 	my $wavfile = shift;
 	my $engine_url = shift;
 
+	my $res = callNuanceEnglishAsrEngine_request($wavfile,$engine_url);
+	print $res->{result}."\n";
+	print $res->{status}."\n";
+
+	my $asr_res = callNuanceEnglishAsrEngine_get($res);
+	print $asr_res."\n";
+	return $asr_res;
+}
+
+sub callNuanceEnglishAsrEngine_request
+{
+	my $wavfile = shift;
+	my $engine_url = shift;
+
+	my $res;
 	my $jsonparser = new JSON;
 
 	my $body_data = {"job_type" => "batch_transcription",
@@ -27,12 +43,20 @@ sub callNuanceEnglishAsrEngine
 	$req->content($jsonparser->encode($body_data));
 
 	my $res = $ua->request($req);
-	my $job_id = $jsonparser->decode($res->content())->{reference};
+	my $jobs_id = $jsonparser->decode($res->content())->{reference};
 
-	#get
-	my $results_url = $engine_url.'/'.$job_id.'/results';
-	my $req = HTTP::Request->new(GET => $results_url);
+	$res->{result} = $engine_url.'/'.$jobs_id.'/results';
+	$res->{status} = $engine_url.'/'.$jobs_id.'/status';
+	return $res;
+}
 
+sub callNuanceEnglishAsrEngine_get
+{
+	my $ref = shift;
+	my $jsonparser = new JSON;
+
+	my $ua = LWP::UserAgent->new;
+	my $req = HTTP::Request->new(GET => $ref->{result});
 	my $res = $ua->request($req);
 	my $content = $jsonparser->decode($res->decoded_content);
 	return $content->{channels}->{channel1}->{transcript}->[0]->{text};
