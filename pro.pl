@@ -5,24 +5,7 @@ use JSON;
 use Data::Dumper;
 use LWP::UserAgent;
 
-#my $res = OuterServer::callNuanceEnglishAsrEngine('http://li4240789.vicp.io:9000/data/voa/special/vadnn/chinese-businesses-wholesale-capital-struggle-economy-slows/chinese-businesses-wholesale-capital-struggle-economy-slows-034.wav','http://li4240789.vicp.io:8081/v4/jobs');
-#print Dumper($res)."\n";
-#use LWP::UserAgent;
-#use JSON;
-
-#my $url = 'http://li4240789.vicp.io:8081/v4/jobs/c57a96e0-f504-11e8-ae7f-158de6cf37b1/results';
-#my $ua = LWP::UserAgent->new;
-#my $req = HTTP::Request->new(GET => $url);
-
-# send request
-#my $jsonparser = new JSON;
-#my $res = $ua->request($req);
-#my $ref = $jsonparser->decode($res->decoded_content);
-#print $ref->{channels}->{channel1}->{transcript}->[0]->{text}."\n";
-
-my $asr_res = callNuanceEnglishAsrEngine('http://192.168.1.20:9000/data/voa/special/vadnn/chinese-businesses-wholesale-capital-struggle-economy-slows/chinese-businesses-wholesale-capital-struggle-economy-slows-034.wav','http://192.168.1.20:8081/v4/jobs');
-
-print $asr_res."\n";
+callNuanceEnglishAsrEngine('http://192.168.1.20:9000/data/voa/special/vadnn/chinese-businesses-wholesale-capital-struggle-economy-slows/chinese-businesses-wholesale-capital-struggle-economy-slows-034.wav','http://192.168.1.20:8081/v4/jobs');
 
 sub callNuanceEnglishAsrEngine
 {
@@ -35,7 +18,6 @@ sub callNuanceEnglishAsrEngine
 
 	my $asr_res = callNuanceEnglishAsrEngine_get($res);
 	print $asr_res."\n";
-	return $asr_res;
 }
 
 sub callNuanceEnglishAsrEngine_request
@@ -47,11 +29,9 @@ sub callNuanceEnglishAsrEngine_request
 	my $jsonparser = new JSON;
 
 	my $body_data = {"job_type" => "batch_transcription",
-					"channels" => {"channel1" => 
-									{"format" => "audio/wave","result_format" => "transcript"}
-								},
-					"model" => {"name" => "eng-usa","sample_rate" => 16000},
-					"operating_mode" => "accurate"};
+			 "channels" => {"channel1" => {"format" => "audio/wave","result_format" => "transcript"}},
+			    "model" => {    "name" => "eng-usa","sample_rate" => 16000},
+	       	   "operating_mode" => "accurate"};
 	$body_data->{channels}->{channel1}->{url} = $wavfile;
 
 	#send
@@ -73,12 +53,36 @@ sub callNuanceEnglishAsrEngine_get
 	my $ref = shift;
 	my $jsonparser = new JSON;
 
-	my $ua = LWP::UserAgent->new;
-	my $req = HTTP::Request->new(GET => $ref->{result});
+	my $ref_result;
+	my $ref_status;
 
-	# send request
-	my $res = $ua->request($req);
-	my $ref = $jsonparser->decode($res->decoded_content);
-	print Dumper($ref)."\n";
+	while(1)
+	{
+		my $ua = LWP::UserAgent->new;
+		my $req_result = HTTP::Request->new(GET => $ref->{result});
+		my $req_status = HTTP::Request->new(GET => $ref->{status});
+
+		my $res_result = $ua->request($req_result);
+		my $res_status = $ua->request($req_status);
+
+		$ref_result = $jsonparser->decode($res_result->decoded_content);
+		$ref_status = $jsonparser->decode($res_status->decoded_content);
+
+		if($ref_status->{status} eq 'TRANSCRIBED')
+		{
+			last;
+		}
+		else
+		{
+			#print $ref_status->{status}."\n";
+			sleep(1);
+		}
+	}
+	
+	my $res = $ref_result->{channels}->{channel1}->{transcript}->[0]->{text};
+	return $res;
 }
+
+1;
+
 
