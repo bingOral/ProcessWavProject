@@ -11,6 +11,7 @@ use script::CallOuterServer;
 if(scalar(@ARGV) != 2)
 {
 	print "Usage : perl $0 input.list threadnum\n";
+	exit;
 }
 
 my $jsonparser = new JSON;
@@ -66,7 +67,7 @@ sub init
 
 sub dowork
 {
-	my $wavs = =shift;
+	my $wavs = shift;
 	my $param = shift;
 
 	my $engine_url = $param->{nuance_engine_url};
@@ -82,5 +83,4 @@ sub dowork
 }
 
 1;
-
 
