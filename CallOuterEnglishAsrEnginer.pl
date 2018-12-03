@@ -77,8 +77,8 @@ sub dowork
 	{
 		chomp($wav);
 
-		my $asr_res = OuterServer::callNuanceEnglishAsrEngine($fileserver_url.$wav,$engine_url);
-		print $wav.'|'.$asr_res."\n";
+		my $url = OuterServer::callNuanceEnglishAsrEngine_request($fileserver_url.$wav,$engine_url);
+		print $wav.'|'.$url."\n";
 	}
 }
 
