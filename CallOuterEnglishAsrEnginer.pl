@@ -82,10 +82,12 @@ sub dowork
 	{
 		chomp($wavname);
 		$wavname =~ s/^\s+|\s+$//g;
-		
-		my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$wavname,$engine_url);
-		print $wavname.'|'.$reference."\n";
-		#die;
+		if($wavname)
+		{		
+			my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$wavname,$engine_url);
+			print $wavname.'|'.$reference."\n";
+			#die;
+		}
 	}
 }
 

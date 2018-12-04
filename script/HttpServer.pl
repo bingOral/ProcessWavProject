@@ -15,30 +15,34 @@ post '/result' => sub
 	my $self = shift;
 	my $result = $self->req->json;
 	my $reference = $result->{reference};	
-	my $text = 'NULL';
-	try
+	my $text;
+
+	my $error_info = scalar(@{$result->{channels}->{channel1}->{errors}});
+	if($error_info > 0)
+	{
+		$text = 'NULL';
+	}
+	else
 	{
 		$text = $result->{channels}->{channel1}->{transcript}->[0]->{text};
 	}
-	catch
-	{
-		$text = 'NULL';
-		print 'Error : '.$reference."\n";			
-	};
 	
 	my $results = $es->search(index => $index, body => {query => {match => {_id => $reference}}});
 	my $wavname = $results->{hits}->{hits}->[0]->{_source}->{wavname};
 
 	print $wavname.":".$reference.":".$text."\n";	
-	$es->index(index => $index,
-		 type    => 'data',
-		 id      => $reference,
-		 body    => {
-			wavname => $wavname,
-		     reference  => $reference,
-			   text => $text
-			}
-		);
+	if($wavname)
+	{
+		$es->index(index => $index,
+			 type    => 'data',
+			 id      => $reference,
+			 body    => {
+				wavname => $wavname,
+		    	     reference  => $reference,
+				   text => $text
+				}
+			);
+	}
 };
 	
 app->start;

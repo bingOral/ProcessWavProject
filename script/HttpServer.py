@@ -3,7 +3,7 @@ from elasticsearch import Elasticsearch
 import json
  
 app = Flask(__name__)
-es = Elasticsearch()
+es = Elasticsearch(['http://192.168.1.20:9200/'])
 index = 'callserv_call_nuance_en'
 
 @app.route('/result', methods=['POST'])
@@ -19,8 +19,11 @@ def my_json():
 		asr_res = "@"
 
 	#query
-	q_res = es.search(index=index, body={"query": {"match_all": { "_id" : "reference"}}})
+	body = "{\"query\": {\"match_all\": {\"reference\" : \"%s\"}}}" % reference
+	q_res = es.search(index=index, body=json.loads(body))
+	print q_res
 	wavname =  q_res['_source']['wavname']
+	print wavname
 	
 	#insert
 	doc = {
