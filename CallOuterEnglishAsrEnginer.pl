@@ -76,32 +76,16 @@ sub dowork
 
 	my $engine_url = $param->{nuance_engine_url};
 	my $fileserver_url = $param->{fileserver_url};
+	my $index = 'callserv_call_nuance_en';
 	
 	foreach my $wavname (@$wavs)
 	{
 		chomp($wavname);
 		$wavname =~ s/^\s+|\s+$//g;
 		
-		my $index = 'callserv_call_nuance_en';
-		my $results = $es->search(index => $index, body => {query => {match => {_id => $wavname}}});
-		my $flag = $results->{hits}->{total};
-		
-		if($flag == 0)
-		{
-			my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$wavname,$engine_url);
-			print $wav.'|'.$reference."\n";
-		}
-		else
-		{
-			my $text = $results->{hits}->{hits}->[0]->{_source}->{text};
-			if($text)
-			{
-				my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$wavname,$engine_url);
-				print $wav.'|'.$reference."\n";
-			}
-		}
-
-		die;
+		my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$wavname,$engine_url);
+		print $wavname.'|'.$reference."\n";
+		#die;
 	}
 }
 
