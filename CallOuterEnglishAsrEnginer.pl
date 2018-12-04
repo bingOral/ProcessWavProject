@@ -76,9 +76,8 @@ sub dowork
 	foreach my $wav (@$wavs)
 	{
 		chomp($wav);
-
-		my $url = OuterServer::callNuanceEnglishAsrEngine_request($fileserver_url.$wav,$engine_url);
-		print $wav.'|'.$url."\n";
+		my $reference = OuterServer::callNuanceEnglishAsrEngine($fileserver_url.$wav,$engine_url);
+		print $wav.'|'.$reference."\n";
 	}
 }
 
