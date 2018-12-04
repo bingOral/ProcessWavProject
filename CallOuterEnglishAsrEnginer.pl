@@ -78,7 +78,7 @@ sub dowork
 	
 	my $fileserver_url = $param->{fileserver_url};
 	my $http_start_port = $param->{nuance_engine_start_port} + $key;
-	my $engine_url = ($param->{nuance_engine_url}).':'.$http_start_port;
+	my $engine_url = ($param->{nuance_engine_url}).':'.$http_start_port.'/v4/jobs';
 	my $index = 'callserv_call_nuance_en';
 	
 	foreach my $wavname (@$wavs)
@@ -89,8 +89,8 @@ sub dowork
 		{
 
 			my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$wavname,$engine_url);
-			print $wavname.'|'.$reference."\n";
-			die;
+			print $engine_url."|".$wavname.'|'.$reference."\n";
+			#die;
 		}
 	}
 }
