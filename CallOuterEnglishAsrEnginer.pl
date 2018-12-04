@@ -32,7 +32,7 @@ sub Main
 	my @threads;
 	foreach my $key (keys %$group)
 	{
-		my $thread = threads->create(\&dowork,$group->{$key},$param,$es);
+		my $thread = threads->create(\&dowork,$group->{$key},$key,$param,$es);
 		push @threads,$thread;
 	}
 
@@ -65,17 +65,20 @@ sub init
 	my $res;
 	$res->{nuance_engine_url} = $config->{process_Wav_config}->{nuance_engine_url};
 	$res->{fileserver_url} = $config->{process_Wav_config}->{fileserver_url};
+	$res->{nuance_engine_start_port} = $config->{process_Wav_config}->{nuance_engine_start_port};
 	return $res;
 }
 
 sub dowork
 {
 	my $wavs = shift;
+	my $key =  shift;
 	my $param = shift;
 	my $es = shift;
-
-	my $engine_url = $param->{nuance_engine_url};
+	
 	my $fileserver_url = $param->{fileserver_url};
+	my $http_start_port = $param->{nuance_engine_start_port} + $key;
+	my $engine_url = ($param->{nuance_engine_url}).':'.$http_start_port;
 	my $index = 'callserv_call_nuance_en';
 	
 	foreach my $wavname (@$wavs)
@@ -83,10 +86,11 @@ sub dowork
 		chomp($wavname);
 		$wavname =~ s/^\s+|\s+$//g;
 		if($wavname)
-		{		
+		{
+
 			my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$wavname,$engine_url);
 			print $wavname.'|'.$reference."\n";
-			#die;
+			die;
 		}
 	}
 }

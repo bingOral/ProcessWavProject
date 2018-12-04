@@ -7,8 +7,8 @@ my $config = Config::Tiny->new;
 $config = Config::Tiny->read('config/config.ini', 'utf8');
 
 my $nuance_engine_thread = $config->{process_Wav_config}->{nuance_engine_thread};
-my $http_start_port = 11001;
-my $https_start_port = 12001;
+my $http_start_port = $config->{process_Wav_config}->{nuance_engine_start_port};
+my $https_start_port = 21001;
 
 system("killall nte");
 for(my $i = 0; $i < $nuance_engine_thread; $i++)
