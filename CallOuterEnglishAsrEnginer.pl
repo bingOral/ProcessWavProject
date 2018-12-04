@@ -4,8 +4,10 @@ use strict;
 use JSON;
 use threads;
 use Encode;
+use Try::Tiny;
 use Config::Tiny;
 use LWP::UserAgent;
+use Search::Elasticsearch;
 use script::CallOuterServer;
 
 if(scalar(@ARGV) != 2)
@@ -25,11 +27,12 @@ sub Main
 	my @tasks = <IN>;
 	my $group = div(\@tasks,$threadnum);
 	my $param = init();
+	my $es = Search::Elasticsearch->new(nodes=>['192.168.1.20:9200'], cxn_pool => 'Sniff');
 
 	my @threads;
 	foreach my $key (keys %$group)
 	{
-		my $thread = threads->create(\&dowork,$group->{$key},$param);
+		my $thread = threads->create(\&dowork,$group->{$key},$param,$es);
 		push @threads,$thread;
 	}
 
@@ -69,15 +72,36 @@ sub dowork
 {
 	my $wavs = shift;
 	my $param = shift;
+	my $es = shift;
 
 	my $engine_url = $param->{nuance_engine_url};
 	my $fileserver_url = $param->{fileserver_url};
 	
-	foreach my $wav (@$wavs)
+	foreach my $wavname (@$wavs)
 	{
-		chomp($wav);
-		my $reference = OuterServer::callNuanceEnglishAsrEngine($fileserver_url.$wav,$engine_url);
-		print $wav.'|'.$reference."\n";
+		chomp($wavname);
+		$wavname =~ s/^\s+|\s+$//g;
+		
+		my $index = 'callserv_call_nuance_en';
+		my $results = $es->search(index => $index, body => {query => {match => {_id => $wavname}}});
+		my $flag = $results->{hits}->{total};
+		
+		if($flag == 0)
+		{
+			my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$wavname,$engine_url);
+			print $wav.'|'.$reference."\n";
+		}
+		else
+		{
+			my $text = $results->{hits}->{hits}->[0]->{_source}->{text};
+			if($text)
+			{
+				my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$wavname,$engine_url);
+				print $wav.'|'.$reference."\n";
+			}
+		}
+
+		die;
 	}
 }
 

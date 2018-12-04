@@ -4,21 +4,22 @@ package OuterServer;
 use strict;
 use JSON;
 use LWP::UserAgent;
-use Data::Dumper;
 
 sub callNuanceEnglishAsrEngine
 {
-	my $wavfile = shift;
+	my $index = shift;
+	my $es = shift;
+	my $prefix = shift;
+	my $wavname = shift;
 	my $engine_url = shift;
 
 	my $jsonparser = new JSON;
-
 	my $body_data = {"job_type" => "batch_transcription",
 			 "channels" => {"channel1" => {"format" => "audio/wave","result_format" => "transcript"}},
-		            "model" => {"name" => "eng-usa","sample_rate" => 16000},
+			    "model" => {"name" => "eng-usa","sample_rate" => 16000},
 		     "callback_url" => 'http://192.168.1.20:6000/result'
 		   "operating_mode" => "accurate"};
-	$body_data->{channels}->{channel1}->{url} = $wavfile;
+	$body_data->{channels}->{channel1}->{url} = $prefix.$wavname;
 
 	#send
 	my $ua = LWP::UserAgent->new;
@@ -28,6 +29,16 @@ sub callNuanceEnglishAsrEngine
 
 	my $res = $ua->request($req);
 	my $jobs_id = $jsonparser->decode($res->content())->{reference};
+	
+	$es->index(index => $index,
+		 type    => 'data',
+		 id      => $jobs_id,
+		 body    => {wavname => $wavname,
+			   reference => $jobs_id,
+			        text => ""
+			}
+		);
+
 	return $jobs_id;
 }
 
