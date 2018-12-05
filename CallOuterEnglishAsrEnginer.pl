@@ -84,8 +84,36 @@ sub dowork
 	foreach my $wavname (@$wavs)
 	{
 		chomp($wavname);
-		my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$wavname,$engine_url);
-		print "+++++++++++++++".$engine_url."|".$wavname.'|'.$reference."++++++++++++++++++++++++++++\n\n";
+		print $wavname."\n";
+		my $pro_wavname = mv($wavname);
+		my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$pro_wavname,$engine_url);
+		print $engine_url."|".$pro_wavname.'|'.$reference."\n";
+	}
+}
+
+sub mv
+{
+	my $filename = shift;
+
+	my $dir;
+	my $oldname;
+	my $newname;
+	if($filename =~ /(.*\/)(.*.wav)/)
+	{
+		$dir = $1;
+		$oldname = $2;
+		my $flag = index($oldname,'%',0);
+		if($flag >= 0)
+		{
+			$newname = $oldname;
+			$newname =~ s/%//g;
+			qx(cp $filename $dir.$newname);
+			return $dir.$newname;
+		}
+		else
+		{
+			return $filename;
+		}
 	}
 }
 
