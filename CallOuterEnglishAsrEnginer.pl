@@ -84,7 +84,6 @@ sub dowork
 	foreach my $wavname (@$wavs)
 	{
 		chomp($wavname);
-		print $wavname."\n";
 		my $pro_wavname = mv($wavname);
 		my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$pro_wavname,$engine_url);
 		print $engine_url."|".$pro_wavname.'|'.$reference."\n";
@@ -99,12 +98,11 @@ sub mv
 	my $second_dir;
 	my $oldname;
 	my $newname;
-	#/data/voa/special/vadnn/se-tia-home%20buying%20after%20the%20crash-24jan11/se-tia-home%20buying%20after%20the%20crash-24jan11-110.wav
 	if($filename =~ /(.*\/vadnn\/)(.*\/)(.*.wav)/)
 	{
 		$first_dir = $1;
 		$second_dir = $2;
-		$oldname = $2;
+		$oldname = $3;
 
 		my $flag = index($oldname,'%',0);
 		if($flag >= 0)
@@ -113,10 +111,10 @@ sub mv
 			$newname =~ s/%//g;
 			$second_dir =~ s/%//g;
 			my $f_str = "mkdir -p ".$first_dir.$second_dir;
-			my $s_str = "cp ".$filename." ".$first_dir.$second_dir,$newname;
-			#qx(cp $filename $dir$newname);
-			
-			return $dir.$newname;
+			my $s_str = "cp ".$filename." ".$first_dir.$second_dir.$newname;
+			system($f_str);	
+			system($s_str);	
+			return $first_dir.$second_dir.$newname;
 		}
 		else
 		{
