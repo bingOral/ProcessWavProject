@@ -95,19 +95,27 @@ sub mv
 {
 	my $filename = shift;
 
-	my $dir;
+	my $first_dir;
+	my $second_dir;
 	my $oldname;
 	my $newname;
-	if($filename =~ /(.*\/)(.*.wav)/)
+	#/data/voa/special/vadnn/se-tia-home%20buying%20after%20the%20crash-24jan11/se-tia-home%20buying%20after%20the%20crash-24jan11-110.wav
+	if($filename =~ /(.*\/vadnn\/)(.*\/)(.*.wav)/)
 	{
-		$dir = $1;
+		$first_dir = $1;
+		$second_dir = $2;
 		$oldname = $2;
+
 		my $flag = index($oldname,'%',0);
 		if($flag >= 0)
 		{
 			$newname = $oldname;
 			$newname =~ s/%//g;
-			qx(cp $filename $dir.$newname);
+			$second_dir =~ s/%//g;
+			my $f_str = "mkdir -p ".$first_dir.$second_dir;
+			my $s_str = "cp ".$filename." ".$first_dir.$second_dir,$newname;
+			#qx(cp $filename $dir$newname);
+			
 			return $dir.$newname;
 		}
 		else
