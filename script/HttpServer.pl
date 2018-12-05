@@ -16,8 +16,19 @@ post '/result' => sub
 	my $result = $self->req->json;
 	my $reference = $result->{reference};	
 	my $text;
+	my $error_info = 0;
 
-	my $error_info = scalar(@{$result->{channels}->{channel1}->{errors}});
+	try
+	{
+		$error_info = scalar(@{$result->{channels}->{channel1}->{errors}});
+	}
+	catch
+	{
+		$error_info = scalar(@{$result->{errors}});
+		#print "+++++++++++++++++++++++\n".Dumper($result)."\n++++++++++++++++++++++++++++++\n";
+		#return;
+	};
+
 	if($error_info > 0)
 	{
 		$text = 'NULL';

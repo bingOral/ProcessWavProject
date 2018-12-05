@@ -75,18 +75,20 @@ sub dowork
 	my $key =  shift;
 	my $param = shift;
 	my $es = shift;
+	my $wavname = "";
 	
 	my $fileserver_url = $param->{fileserver_url};
 	my $http_start_port = $param->{nuance_engine_start_port} + $key;
 	my $engine_url = ($param->{nuance_engine_url}).':'.$http_start_port.'/v4/jobs';
 	my $index = 'callserv_call_nuance_en';
 	
-	foreach my $wavname (@$wavs)
+	foreach $wavname (@$wavs)
 	{
 		chomp($wavname);
 		my $pro_wavname = mv($wavname);
 		my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$pro_wavname,$engine_url);
 		print $engine_url."|".$pro_wavname.'|'.$reference."\n";
+		$wavname = "";
 	}
 }
 
