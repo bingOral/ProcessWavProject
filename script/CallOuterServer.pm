@@ -28,18 +28,28 @@ sub callNuanceEnglishAsrEngine
 	$req->content($jsonparser->encode($body_data));
 
 	my $res = $ua->request($req);
-	my $jobs_id = $jsonparser->decode($res->content())->{reference};
-	
-	$es->index(index => $index,
-		 type    => 'data',
-		 id      => $jobs_id,
-		 body    => {wavname => $wavname,
-			   reference => $jobs_id,
-			        text => ""
+	my $jobs_id;
+	if($res->is_success)
+	{
+		$jobs_id = $jsonparser->decode($res->content())->{reference};
+		$es->index(index => $index,
+		 	    type => 'data',
+		 	    id   => $jobs_id,
+		 	    body => {wavname => $wavname,
+			   	   reference => $jobs_id,
+			                text => ""
 			}
 		);
 
-	return $jobs_id;
+		return $jobs_id;
+
+	}
+	else
+	{
+		print "HTTP POST error code: ", $res->code, "\n";
+    		print "HTTP POST error message: ", $res->message, "\n";
+		callNuanceEnglishAsrEngine($index,$es,$prefix,$wavname,$engine_url);
+	}
 }
 
 sub callBaiduEnglishAsrEngine

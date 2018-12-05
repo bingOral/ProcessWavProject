@@ -84,14 +84,8 @@ sub dowork
 	foreach my $wavname (@$wavs)
 	{
 		chomp($wavname);
-		$wavname =~ s/^\s+|\s+$//g;
-		if($wavname)
-		{
-
-			my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$wavname,$engine_url);
-			print $engine_url."|".$wavname.'|'.$reference."\n";
-			#die;
-		}
+		my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$wavname,$engine_url);
+		print "+++++++++++++++".$engine_url."|".$wavname.'|'.$reference."++++++++++++++++++++++++++++\n\n";
 	}
 }
 
