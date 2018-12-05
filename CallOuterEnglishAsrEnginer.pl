@@ -10,9 +10,9 @@ use LWP::UserAgent;
 use Search::Elasticsearch;
 use script::CallOuterServer;
 
-if(scalar(@ARGV) != 2)
+if(scalar(@ARGV) != 1)
 {
-	print "Usage : perl $0 input.list threadnum\n";
+	print "Usage : perl $0 input.list\n";
 	exit;
 }
 
@@ -23,10 +23,10 @@ open(IN,$ARGV[0])||die("The file can't find!\n");
 
 sub Main
 {
-	my $threadnum = $ARGV[1];
+	my $param = init();
+	my $threadnum = $param->{nuance_engine_thread};
 	my @tasks = <IN>;
 	my $group = div(\@tasks,$threadnum);
-	my $param = init();
 	my $es = Search::Elasticsearch->new(nodes=>['192.168.1.20:9200'], cxn_pool => 'Sniff');
 
 	my @threads;
@@ -66,6 +66,7 @@ sub init
 	$res->{nuance_engine_url} = $config->{process_Wav_config}->{nuance_engine_url};
 	$res->{fileserver_url} = $config->{process_Wav_config}->{fileserver_url};
 	$res->{nuance_engine_start_port} = $config->{process_Wav_config}->{nuance_engine_start_port};
+	$res->{nuance_engine_thread} = $config->{process_Wav_config}->{nuance_engine_thread};
 	return $res;
 }
 
@@ -75,20 +76,18 @@ sub dowork
 	my $key =  shift;
 	my $param = shift;
 	my $es = shift;
-	my $wavname = "";
 	
 	my $fileserver_url = $param->{fileserver_url};
 	my $http_start_port = $param->{nuance_engine_start_port} + $key;
 	my $engine_url = ($param->{nuance_engine_url}).':'.$http_start_port.'/v4/jobs';
 	my $index = 'callserv_call_nuance_en';
 	
-	foreach $wavname (@$wavs)
+	foreach my $wavname (@$wavs)
 	{
 		chomp($wavname);
 		my $pro_wavname = mv($wavname);
 		my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$pro_wavname,$engine_url);
 		print $engine_url."|".$pro_wavname.'|'.$reference."\n";
-		$wavname = "";
 	}
 }
 
