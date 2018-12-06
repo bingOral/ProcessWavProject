@@ -43,21 +43,18 @@ post '/result' => sub
 	my $server = $results->{hits}->{hits}->[0]->{_source}->{server};
 	
 	print $wavname.":".$reference.":".$text.":".$length."\n" if $text;	
-	#print Dumper($result) unless $text;
-	if($wavname)
-	{
-		$es->index(index => $index,
-			 type    => 'data',
-			 id      => $wavname,
-			 body    => {
-				wavname => $wavname,
-		    	     reference  => $reference,
-				   text => $text,
-				 server => $server,
-				 length => $length
-				}
-			);
-	}
+
+	$es->index(index => $index,
+		 type    => 'data',
+		 id      => $wavname,
+		 body    => {
+			wavname => $wavname,
+	    	     reference  => $reference,
+			   text => $text,
+			 server => $server,
+			 length => $length
+			}
+		);
 };
 	
 app->start;
