@@ -43,7 +43,7 @@ post '/result' => sub
 	my $server = $results->{hits}->{hits}->[0]->{_source}->{server};
 	
 	print $wavname.":".$reference.":".$text.":".$length."\n" if $text;	
-	print Dumper($result) unless $text;
+	#print Dumper($result) unless $text;
 	if($wavname)
 	{
 		$es->index(index => $index,
