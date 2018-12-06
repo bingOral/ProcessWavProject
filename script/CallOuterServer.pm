@@ -34,10 +34,11 @@ sub callNuanceEnglishAsrEngine
 		$jobs_id = $jsonparser->decode($res->content())->{reference};
 		$es->index(index => $index,
 		 	    type => 'data',
-		 	    id   => $jobs_id,
+		 	    id   => $wavname,
 		 	    body => {wavname => $wavname,
 			   	   reference => $jobs_id,
-			                text => ""
+			                text => "",
+			              server => $engine_url
 			}
 		);
 

@@ -25,8 +25,6 @@ post '/result' => sub
 	catch
 	{
 		$error_info = scalar(@{$result->{errors}});
-		#print "+++++++++++++++++++++++\n".Dumper($result)."\n++++++++++++++++++++++++++++++\n";
-		#return;
 	};
 
 	if($error_info > 0)
@@ -38,19 +36,21 @@ post '/result' => sub
 		$text = $result->{channels}->{channel1}->{transcript}->[0]->{text};
 	}
 	
-	my $results = $es->search(index => $index, body => {query => {match => {_id => $reference}}});
+	my $results = $es->search(index => $index, body => {query => {match => {reference => $reference}}});
 	my $wavname = $results->{hits}->{hits}->[0]->{_source}->{wavname};
+	my $server = $results->{hits}->{hits}->[0]->{_source}->{server};
 
-	print $wavname.":".$reference.":".$text."\n";	
+	print $wavname.":".$reference.":".$text."\n" if $text;	
 	if($wavname)
 	{
 		$es->index(index => $index,
 			 type    => 'data',
-			 id      => $reference,
+			 id      => $wavname,
 			 body    => {
 				wavname => $wavname,
 		    	     reference  => $reference,
-				   text => $text
+				   text => $text,
+				 server => $server
 				}
 			);
 	}

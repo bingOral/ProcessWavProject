@@ -48,13 +48,13 @@ sub div
 	my $threadnum = shift;
 
 	my $res;
-    	for(my $i = 0; $i < scalar(@$ref); $i++)
+	for(my $i = 0; $i < scalar(@$ref); $i++)
    	{
    		my $flag = $i%$threadnum;
    		push @{$res->{$flag}},$ref->[$i];
     	}
 
-    	return $res;
+	return $res;
 }
 
 sub init
@@ -77,17 +77,45 @@ sub dowork
 	my $param = shift;
 	my $es = shift;
 	
+	my $index = 'callserv_call_nuance_en';
 	my $fileserver_url = $param->{fileserver_url};
 	my $http_start_port = $param->{nuance_engine_start_port} + $key;
 	my $engine_url = ($param->{nuance_engine_url}).':'.$http_start_port.'/v4/jobs';
-	my $index = 'callserv_call_nuance_en';
 	
 	foreach my $wavname (@$wavs)
 	{
 		chomp($wavname);
 		my $pro_wavname = mv($wavname);
-		my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$pro_wavname,$engine_url);
-		print $engine_url."|".$pro_wavname.'|'.$reference."\n";
+		my $flag = query($wavname,$es,$index);
+		if($flag eq 'false')
+		{
+			my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$pro_wavname,$engine_url);
+			print $engine_url."|".$pro_wavname.'|'.$reference."\n";
+		}
+		elsif($flag eq 'true')
+		{
+			print $pro_wavname." has been processed!\n";
+		}
+	}
+}
+
+sub query
+{
+	my $wavname = shift;
+	my $es = shift;
+	my $index = shift;
+
+	my $results = $es->search(index => $index,body => {query => {match => {_id => $wavname}}});
+	my $flag = $results->{hits}->{total};
+	my $text = $results->{hits}->{hits}->[0]->{text};
+	
+	if($flag > 0 and $text ne '')
+	{
+		return 'true';
+	}
+	else
+	{
+		return 'false';
 	}
 }
 
