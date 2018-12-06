@@ -92,7 +92,16 @@ sub dowork
 		my $flag = query($wavname,$es,$index);
 		if($flag eq 'false')
 		{
-			my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$pro_wavname,$engine_url,$nunace_callback_url);
+			my $reference;
+			try
+			{
+				$reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$pro_wavname,$engine_url,$nunace_callback_url);
+			}
+			catch
+			{
+				$reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$pro_wavname,$engine_url,$nunace_callback_url);
+			};
+
 			print $engine_url."|".$pro_wavname.'|'.$reference."\n";
 		}
 		elsif($flag eq 'true')
