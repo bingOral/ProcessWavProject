@@ -68,6 +68,7 @@ sub init
 	$res->{fileserver_url} = $config->{process_Wav_config}->{fileserver_url};
 	$res->{nuance_engine_start_port} = $config->{process_Wav_config}->{nuance_engine_start_port};
 	$res->{nuance_engine_thread} = $config->{process_Wav_config}->{nuance_engine_thread};
+	$res->{nunace_callback_url} = $config->{process_Wav_config}->{nunace_callback_url};
 	return $res;
 }
 
@@ -82,6 +83,7 @@ sub dowork
 	my $fileserver_url = $param->{fileserver_url};
 	my $http_start_port = $param->{nuance_engine_start_port} + $key;
 	my $engine_url = ($param->{nuance_engine_url}).':'.$http_start_port.'/v4/jobs';
+	my $nunace_callback_url = $param->{nunace_callback_url};
 	
 	foreach my $wavname (@$wavs)
 	{
@@ -90,7 +92,7 @@ sub dowork
 		my $flag = query($wavname,$es,$index);
 		if($flag eq 'false')
 		{
-			my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$pro_wavname,$engine_url);
+			my $reference = OuterServer::callNuanceEnglishAsrEngine($index,$es,$fileserver_url,$pro_wavname,$engine_url,$nunace_callback_url);
 			print $engine_url."|".$pro_wavname.'|'.$reference."\n";
 		}
 		elsif($flag eq 'true')
