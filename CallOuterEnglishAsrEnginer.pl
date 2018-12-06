@@ -6,6 +6,7 @@ use threads;
 use Encode;
 use Try::Tiny;
 use Config::Tiny;
+use Data::Dumper;
 use LWP::UserAgent;
 use Search::Elasticsearch;
 use script::CallOuterServer;
@@ -107,7 +108,7 @@ sub query
 
 	my $results = $es->search(index => $index,body => {query => {match => {_id => $wavname}}});
 	my $flag = $results->{hits}->{total};
-	my $text = $results->{hits}->{hits}->[0]->{text};
+	my $text = $results->{hits}->{hits}->[0]->{_source}->{text};
 	
 	if($flag > 0 and $text ne '')
 	{
