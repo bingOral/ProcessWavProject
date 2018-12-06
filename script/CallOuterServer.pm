@@ -39,7 +39,7 @@ sub callNuanceEnglishAsrEngine
 			   	   reference => $jobs_id,
 			                text => "",
 			              server => $engine_url,
-			              length => ""
+			              length => 0
 			}
 		);
 
