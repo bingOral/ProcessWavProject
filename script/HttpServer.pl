@@ -16,6 +16,7 @@ post '/result' => sub
 	my $result = $self->req->json;
 	my $reference = $result->{reference};	
 	my $text;
+	my $length = 0;
 	my $error_info = 0;
 
 	try
@@ -34,13 +35,15 @@ post '/result' => sub
 	else
 	{
 		$text = $result->{channels}->{channel1}->{transcript}->[0]->{text};
+		$length = $result->{channels}->{channel1}->{statistics}->{audio_length};
 	}
 	
 	my $results = $es->search(index => $index, body => {query => {match => {reference => $reference}}});
 	my $wavname = $results->{hits}->{hits}->[0]->{_source}->{wavname};
 	my $server = $results->{hits}->{hits}->[0]->{_source}->{server};
-
-	print $wavname.":".$reference.":".$text."\n" if $text;	
+	
+	print $wavname.":".$reference.":".$text.":".$length."\n" if $text;	
+	print Dumper($result) unless $text;
 	if($wavname)
 	{
 		$es->index(index => $index,
@@ -50,7 +53,8 @@ post '/result' => sub
 				wavname => $wavname,
 		    	     reference  => $reference,
 				   text => $text,
-				 server => $server
+				 server => $server,
+				 length => $length
 				}
 			);
 	}

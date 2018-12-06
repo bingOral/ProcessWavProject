@@ -38,7 +38,8 @@ sub callNuanceEnglishAsrEngine
 		 	    body => {wavname => $wavname,
 			   	   reference => $jobs_id,
 			                text => "",
-			              server => $engine_url
+			              server => $engine_url,
+			              length => ""
 			}
 		);
 
