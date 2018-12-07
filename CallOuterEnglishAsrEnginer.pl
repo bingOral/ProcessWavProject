@@ -89,7 +89,7 @@ sub dowork
 	{
 		chomp($wavname);
 		my $pro_wavname = mv($wavname);
-		my $flag = query($wavname,$es,$index);
+		my $flag = query($pro_wavname,$es,$index);
 		if($flag eq 'false')
 		{
 			my $reference;
