@@ -42,19 +42,22 @@ post '/result' => sub
 	my $wavname = $results->{hits}->{hits}->[0]->{_source}->{wavname};
 	my $server = $results->{hits}->{hits}->[0]->{_source}->{server};
 	
-	print $wavname.":".$reference.":".$text.":".$length."\n" if $text;	
+	print $wavname.":".$reference.":".$text.":".$length."\n" if $text and $wavname;	
 
-	$es->index(index => $index,
-		 type    => 'data',
-		 id      => $wavname,
-		 body    => {
-			wavname => $wavname,
-	    	     reference  => $reference,
-			   text => $text,
-			 server => $server,
-			 length => $length
-			}
-		);
+	if($wavname)
+	{
+		$es->index(index => $index,
+			 type    => 'data',
+		 	 id      => $wavname,
+		 	 body    => {
+				wavname => $wavname,
+	    	     	     reference  => $reference,
+				   text => $text,
+				 server => $server,
+			         length => $length
+				}
+			);
+	}
 };
 	
 app->start;
