@@ -17,7 +17,7 @@ sub callNuanceEnglishAsrEngine
 	my $jsonparser = new JSON;
 	my $body_data = {"job_type" => "batch_transcription",
 			 "channels" => {"channel1" => {"format" => "audio/wave","result_format" => "transcript"}},
-			    "model" => {"name" => "eng-usa","sample_rate" => 16000},
+			    "model" => {    "name" => "eng-usa","sample_rate" => 16000},
 		     "callback_url" => $nunace_callback_url,
 		   "operating_mode" => "accurate"};
 	$body_data->{channels}->{channel1}->{url} = $prefix.$wavname;

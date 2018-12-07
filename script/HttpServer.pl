@@ -47,11 +47,11 @@ post '/result' => sub
 	if($wavname)
 	{
 		$es->index(index => $index,
-			 type    => 'data',
-		 	 id      => $wavname,
-		 	 body    => {
+			    type => 'data',
+		 	     id  => $wavname,
+		 	    body => {
 				wavname => $wavname,
-	    	     	     reference  => $reference,
+	    	     	      reference => $reference,
 				   text => $text,
 				 server => $server,
 			         length => $length
