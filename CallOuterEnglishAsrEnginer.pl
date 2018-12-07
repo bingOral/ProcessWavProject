@@ -121,7 +121,7 @@ sub query
 	my $flag = $results->{hits}->{total};
 	my $text = $results->{hits}->{hits}->[0]->{_source}->{text};
 	
-	if($flag > 0 and $text ne '')
+	if($flag > 0 and $text ne '' and $text ne 'NULL')
 	{
 		return 'true';
 	}
