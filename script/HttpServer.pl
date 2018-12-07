@@ -15,7 +15,7 @@ post '/result' => sub
 	my $self = shift;
 	my $result = $self->req->json;
 	my $reference = $result->{reference};	
-	my $text;
+	my $text = 'NULL';
 	my $length = 0;
 	my $error_info = 0;
 
