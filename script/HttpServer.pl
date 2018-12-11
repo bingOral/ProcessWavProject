@@ -23,17 +23,15 @@ post '/result' => sub
 	try
 	{
 		$error_info = scalar(@{$result->{channels}->{channel1}->{errors}});
+		$text = $result->{channels}->{channel1}->{errors}->[0]->{message};
 	}
 	catch
 	{
 		$error_info = scalar(@{$result->{errors}});
+		$text = "NULL";
 	};
 
-	if($error_info > 0)
-	{
-		$text = 'NULL';
-	}
-	else
+	if($error_info == 0)
 	{
 		$text = $result->{channels}->{channel1}->{transcript}->[0]->{text};
 		$length = $result->{channels}->{channel1}->{statistics}->{audio_length};
