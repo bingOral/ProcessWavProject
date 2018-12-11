@@ -16,25 +16,31 @@ post '/result' => sub
 	$self->inactivity_timeout(300);
 	my $result = $self->req->json;
 	my $reference = $result->{reference};	
+
 	my $text = 'NULL';
 	my $length = 0;
 	my $error_info = 0;
+
+	#print "++++++++++++++++++++++\n";
+	#print Dumper($result);
+	#print "======================\n";
 
 	try
 	{
 		$error_info = scalar(@{$result->{channels}->{channel1}->{errors}});
 		$text = $result->{channels}->{channel1}->{errors}->[0]->{message};
+		$length = $result->{channels}->{channel1}->{statistics}->{audio_length};
 	}
 	catch
 	{
 		$error_info = scalar(@{$result->{errors}});
 		$text = "NULL";
+		$length = 0;
 	};
 
 	if($error_info == 0)
 	{
 		$text = $result->{channels}->{channel1}->{transcript}->[0]->{text};
-		$length = $result->{channels}->{channel1}->{statistics}->{audio_length};
 	}
 	
 	my $results = $es->search(index => $index, body => {query => {match => {reference => $reference}}});
