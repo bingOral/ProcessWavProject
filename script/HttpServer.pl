@@ -13,6 +13,7 @@ my $es = Search::Elasticsearch->new(nodes=>['192.168.1.20:9200'], cxn_pool => 'S
 post '/result' => sub
 {
 	my $self = shift;
+	$self->inactivity_timeout(300);
 	my $result = $self->req->json;
 	my $reference = $result->{reference};	
 	my $text = 'NULL';
