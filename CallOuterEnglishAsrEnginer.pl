@@ -69,6 +69,8 @@ sub init
 	$res->{nuance_engine_start_port} = $config->{process_Wav_config}->{nuance_engine_start_port};
 	$res->{nuance_engine_thread} = $config->{process_Wav_config}->{nuance_engine_thread};
 	$res->{nunace_callback_url} = $config->{process_Wav_config}->{nunace_callback_url};
+	$res->{nuance_asr_text_index} = $config->{process_Wav_config}->{nuance_asr_text_index}
+
 	return $res;
 }
 
@@ -79,7 +81,7 @@ sub dowork
 	my $param = shift;
 	my $es = shift;
 	
-	my $index = 'callserv_call_nuance_en';
+	my $index = $param->{nuance_asr_text_index};
 	my $fileserver_url = $param->{fileserver_url};
 	my $http_start_port = $param->{nuance_engine_start_port} + $key;
 	my $engine_url = ($param->{nuance_engine_url}).':'.$http_start_port.'/v4/jobs';
