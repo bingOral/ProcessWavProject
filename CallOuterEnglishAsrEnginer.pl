@@ -69,7 +69,7 @@ sub init
 	$res->{nuance_engine_start_port} = $config->{process_Wav_config}->{nuance_engine_start_port};
 	$res->{nuance_engine_thread} = $config->{process_Wav_config}->{nuance_engine_thread};
 	$res->{nunace_callback_url} = $config->{process_Wav_config}->{nunace_callback_url};
-	$res->{nuance_asr_text_index} = $config->{process_Wav_config}->{nuance_asr_text_index}
+	$res->{nuance_asr_text_index} = $config->{process_Wav_config}->{nuance_asr_text_index};
 
 	return $res;
 }
