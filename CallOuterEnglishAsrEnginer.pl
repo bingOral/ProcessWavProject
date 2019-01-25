@@ -90,7 +90,8 @@ sub dowork
 	foreach my $wavname (@$wavs)
 	{
 		chomp($wavname);
-		my $pro_wavname = mv($wavname);
+		#my $pro_wavname = mv($wavname);
+		my $pro_wavname = $wavname;
 		my $flag = query($pro_wavname,$es,$index);
 		if($flag eq 'false')
 		{
